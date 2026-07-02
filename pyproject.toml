@@ -1,0 +1,9 @@
+[project]
+name = "itk-wrap-cache-tests"
+version = "0.1.0"
+description = "Validation suite for ITK PR #6533: CastXML two-level cache + SQLite pkl DB"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
