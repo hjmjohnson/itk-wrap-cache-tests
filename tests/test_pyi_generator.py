@@ -42,7 +42,9 @@ def pkl_tree(pkl_db_mod, tmp_path):
     (pkl_dir / "ITKFake.stamp").write_text("")
     (pkl_dir / "ITKFake2.stamp").write_text("")
 
-    index_files = sorted(str(p) for p in pkl_dir.glob("*.index.txt"))
+    # CMake writes GlobalIdxFilesList.txt with forward-slash paths on every
+    # platform; pyi_generator normalizes its glob results to match.
+    index_files = sorted(p.as_posix() for p in pkl_dir.glob("*.index.txt"))
     full_list = tmp_path / "full_list.txt"
     full_list.write_text(";".join(index_files))
     partial_list = tmp_path / "partial_list.txt"
@@ -104,7 +106,7 @@ def test_prune_skipped_when_manifest_missing(pkl_db_mod, pkl_tree, tmp_path):
     pkl_dir, pyi_dir, full_list, _partial, _keys = pkl_tree
     with_missing = tmp_path / "with_missing.txt"
     with_missing.write_text(
-        full_list.read_text() + f";{pkl_dir}/DOES_NOT_EXIST.index.txt"
+        full_list.read_text() + ";" + (pkl_dir / "DOES_NOT_EXIST.index.txt").as_posix()
     )
     r = run_pyi(pkl_dir, pyi_dir, with_missing, "--prune")
     assert r.returncode == 0, r.stderr
